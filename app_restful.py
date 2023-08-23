@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
 from flask_jwt import JWT, jwt_required
 from security import authenticate, identity
 
@@ -30,8 +30,11 @@ class Item(Resource):
         return {'message': f'Item {name} Deleted'}
 
     def put(self,name):
+        parser = reqparse.RequestParser()
+        parser.add_argument('price',type=float,required=True,help='This field can not be left blank!')
         item = next(filter(lambda element : element['name'] == name , items),None)
-        request_data = request.get_json()
+        request_data = parser.parse_args()
+        
         if item is None: # Create new item
             item = {'name' : name, 'price' : request_data['price']}
             items.append(item)
