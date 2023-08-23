@@ -11,6 +11,9 @@ jwt = JWT(app,authenticate, identity) # creates /auth and takes username and pas
 
 items = []
 class Item(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('price',type=float,required=True,help='This field can not be left blank!')
+
     @jwt_required()
     def get(self,name):
         item = next(filter(lambda element : element['name'] == name , items),None)
@@ -19,7 +22,7 @@ class Item(Resource):
     def post(self,name):
         if next(filter(lambda element : element['name'] == name , items),None) :
             return {'message' : 'an item with name {} already exists'.format(name)} , 400
-        request_data = request.get_json()
+        request_data = Item.parser.parse_args()
         item = {'name':name, 'price':request_data['price']}
         items.append(item)
         return item , 201
@@ -29,12 +32,9 @@ class Item(Resource):
         items = list(filter(lambda elem: elem['name'] != name, items))
         return {'message': f'Item {name} Deleted'}
 
-    def put(self,name):
-        parser = reqparse.RequestParser()
-        parser.add_argument('price',type=float,required=True,help='This field can not be left blank!')
+    def put(self,name):        
         item = next(filter(lambda element : element['name'] == name , items),None)
-        request_data = parser.parse_args()
-        
+        request_data = Item.parser.parse_args()
         if item is None: # Create new item
             item = {'name' : name, 'price' : request_data['price']}
             items.append(item)
