@@ -28,6 +28,17 @@ class Item(Resource):
         global items
         items = list(filter(lambda elem: elem['name'] != name, items))
         return {'message': f'Item {name} Deleted'}
+
+    def put(self,name):
+        item = next(filter(lambda element : element['name'] == name , items),None)
+        request_data = request.get_json()
+        if item is None: # Create new item
+            item = {'name' : name, 'price' : request_data['price']}
+            items.append(item)
+        else: # Update the item
+            item.update(request_data)
+        return item
+
     
 class Items(Resource):
     def get(self):
