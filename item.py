@@ -32,7 +32,15 @@ class Item(Resource):
             return {'message' : 'an item with name {} already exists'.format(name)} , 400
         request_data = Item.parser.parse_args()
         item = {'name':name, 'price':request_data['price']}
-        
+        try:
+            self.insert(item)
+        except :
+            return {'message': 'Error occured while inserting'} , 500
+              
+        return item , 201
+    
+    @classmethod
+    def insert(cls,item):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
 
@@ -40,9 +48,7 @@ class Item(Resource):
         cursor.execute(query,(item['name'],item['price']))
         connection.commit()
         connection.close()
-        
-        return item , 201
-    
+
     def delete(self,name):
         connection = sqlite3.connect('data.db')
         cursor = connection.cursor()
