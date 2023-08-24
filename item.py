@@ -61,15 +61,30 @@ class Item(Resource):
         return {'message': f'Item {name} Deleted'}
 
     def put(self,name):        
-        item = next(filter(lambda element : element['name'] == name , items),None)
+        item = Item.find_item_by_name(name)
         request_data = Item.parser.parse_args()
+        updated_item = {'name' : name, 'price' : request_data['price']}
         if item is None: # Create new item
-            item = {'name' : name, 'price' : request_data['price']}
-            items.append(item)
+            try:
+                self.insert(updated_item)
+            except :
+                return {'message': 'Error occured while inserting'} , 500
         else: # Update the item
-            item.update(request_data)
-        return item
+            try:
+                self.update(updated_item)
+            except :
+                return {'message': 'Error occured while inserting'} , 500
+        return updated_item
+    
+    @classmethod
+    def update(cls,item):
+        connection = sqlite3.connect('data.db')
+        cursor = connection.cursor()
 
+        query = "UPDATE items SET price=? WHERE name=?"
+        cursor.execute(query,(item['price'],item['name']))
+        connection.commit()
+        connection.close()
     
 class Items(Resource):
     def get(self):
