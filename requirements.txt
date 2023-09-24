@@ -1,6 +1,4 @@
 aniso8601==9.0.1
-click==8.1.7
-colorama==0.4.6
 Flask==2.2.5
 Flask-JWT==0.3.2
 Flask-RESTful==0.3.10
