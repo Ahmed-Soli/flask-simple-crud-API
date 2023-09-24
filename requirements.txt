@@ -1,5 +1,6 @@
 Flask==2.0.0
 Flask-JWT==0.3.2
 Flask-RESTful==0.3.10
+flask_sqlalchemy
 PyJWT==1.4.2
 
